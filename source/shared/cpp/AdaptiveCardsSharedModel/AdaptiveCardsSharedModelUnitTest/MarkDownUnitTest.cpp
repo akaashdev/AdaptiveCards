@@ -396,6 +396,12 @@ namespace AdaptiveCardsSharedModelUnitTest
             Assert::AreEqual<std::string>("<p><a href=\"https://msn.com\">Bug [021356]</a>: Markdown link parsing</p>", parser.TransformToHtml());
         }
 
+        TEST_METHOD(LinkBasicValidationTest_ValidLinkTestWithEscapedDelimiters)
+        {
+            MarkDownParser parser("[\\[cool link!\\]](https://contoso.com/New%20Document%20\\(1\\).docx)");
+            Assert::AreEqual<std::string>("<p><a href=\"https://contoso.com/New%20Document%20(1).docx\">[cool link!]</a></p>", parser.TransformToHtml());
+        }
+
         TEST_METHOD(LinkBasicValidationTest_InvalidLinkTest)
         {
             MarkDownParser parser("[hello(www.naver.com)");

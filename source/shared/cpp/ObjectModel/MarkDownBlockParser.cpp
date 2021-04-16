@@ -114,8 +114,7 @@ EmphasisParser::EmphasisState EmphasisParser::MatchText(EmphasisParser& parser, 
     const int currentChar = stream.peek();
 
     /// MarkDown keywords
-    if (currentChar == '[' || currentChar == ']' || currentChar == ')' || currentChar == '\n' || currentChar == '\r' ||
-        stream.eof())
+    if (stream.eof() || (parser.m_lookBehind != DelimiterType::Escape) && IsLinkDelimiter(currentChar))
     {
         parser.Flush(currentChar, token);
         return EmphasisState::Captured;
@@ -141,6 +140,11 @@ EmphasisParser::EmphasisState EmphasisParser::MatchText(EmphasisParser& parser, 
     }
     else
     {
+        if (parser.m_lookBehind == DelimiterType::Escape && IsLinkDelimiter(currentChar))
+        {
+            token.pop_back(); // unget the escape char
+        }
+
         parser.UpdateLookBehind(currentChar);
         char streamChar{};
         stream.get(streamChar);
@@ -217,6 +221,11 @@ void EmphasisParser::Flush(const int ch, std::string& currentToken)
 bool EmphasisParser::IsMarkDownDelimiter(const int ch) const
 {
     return ((ch == '*' || ch == '_') && (m_lookBehind != DelimiterType::Escape));
+}
+
+bool EmphasisParser::IsLinkDelimiter(const int ch)
+{
+    return ch == '\n' || ch == '\r' || ch == '[' || ch == ']' || ch == '(' || ch == ')';
 }
 
 void EmphasisParser::CaptureCurrentCollectedStringAsRegularToken(std::string& currentToken)

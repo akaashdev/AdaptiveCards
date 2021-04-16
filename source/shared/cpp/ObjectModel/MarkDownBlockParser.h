@@ -111,6 +111,9 @@ namespace AdaptiveSharedNamespace
 
         // holds currently collected token
         std::string m_current_token;
+
+    private:
+        static bool IsLinkDelimiter(const int ch);
     };
 
     class LinkParser : public MarkDownBlockParser
